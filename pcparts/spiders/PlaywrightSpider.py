@@ -1,6 +1,7 @@
 import scrapy
 from pcparts.io_helper import create_folder
 from scrapy_playwright.page import PageCoroutine
+from pcparts import settings as pcparts_settings
 
 
 class PlaywrightSpider(scrapy.Spider):
@@ -17,7 +18,9 @@ class PlaywrightSpider(scrapy.Spider):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        create_folder(self.name)
+        create_folder(f"{pcparts_settings.OUTPUT_DIR}/{self.name}")
         for category, _ in self.start_urls.items():
-            with open(f"{self.name}/{category}.json", "w") as f:
+            with open(
+                f"{pcparts_settings.OUTPUT_DIR}/{self.name}/{category}.json", "w"
+            ) as f:
                 f.write("[]")

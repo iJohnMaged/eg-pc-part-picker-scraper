@@ -5,15 +5,15 @@
 import json
 import os
 from .io_helper import create_folder
-
-# useful for handling different item types with a single interface
-from itemadapter import ItemAdapter
+from pcparts import settings as pcparts_settings
 
 
 class CategoryPipeline:
     def process_item(self, item, spider):
         create_folder(spider.name)
-        filename = f"{spider.name}/{item['category']}.json"
+        filename = (
+            f"{pcparts_settings.OUTPUT_DIR}/{spider.name}/{item['category']}.json"
+        )
         data = []
         if not os.path.isfile(filename):
             data.append(item)

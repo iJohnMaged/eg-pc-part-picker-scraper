@@ -1,4 +1,2 @@
-CompuArt/*
-EgPrices/*
-
-__pycache__
+scraped_data/
+__pycache__/
