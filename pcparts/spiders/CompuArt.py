@@ -63,7 +63,7 @@ class CompuartSpider(PlaywrightSpider):
                 ),
                 "url": self.encode_url(product.css("div.name a::attr(href)").get()),
             }
-        end_of_products = response.css("div.ias-nofdfsdneleft").get()
+        end_of_products = response.css("div.ias-noneleft").get()
         if end_of_products is not None:
             current_page_number = response.meta.get("page_number")
             current_category = response.meta.get("category")
