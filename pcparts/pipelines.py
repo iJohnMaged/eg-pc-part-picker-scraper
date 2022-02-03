@@ -4,13 +4,11 @@
 # See: https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 import json
 import os
-from .io_helper import create_folder
 from pcparts import settings as pcparts_settings
 
 
 class CategoryPipeline:
     def process_item(self, item, spider):
-        create_folder(spider.name)
         filename = (
             f"{pcparts_settings.OUTPUT_DIR}/{spider.name}/{item['category']}.json"
         )
