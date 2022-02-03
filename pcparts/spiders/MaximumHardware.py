@@ -21,23 +21,6 @@ class MaximumHardwareSpider(PlaywrightSpider):
         mfp="stock_status[7]",
     )
 
-    def generate_url_with_query_params(self, url, page):
-        url_with_query_params = f"{url}?page={page}"
-        for key, value in self.query_params.items():
-            url_with_query_params += f"&{key}={value}"
-        return url_with_query_params
-
-    def start_requests(self):
-        for category, initial_url in self.start_urls.items():
-            metadata = self.initial_metadata.copy()
-            metadata.update(category=category)
-            yield scrapy.Request(
-                self.generate_url_with_query_params(
-                    initial_url, metadata["page_number"]
-                ),
-                meta=metadata,
-            )
-
     async def parse(self, response):
         for product in response.css("div.products-list div.product-layout"):
             image_container = product.css("div.product-image-container")
@@ -62,7 +45,7 @@ class MaximumHardwareSpider(PlaywrightSpider):
                 metadata.update(page_number=metadata["page_number"] + 1)
                 yield response.follow(
                     self.generate_url_with_query_params(
-                        response.url, metadata["page_number"]
+                        next_page, metadata["page_number"]
                     ),
                     meta=metadata,
                 )

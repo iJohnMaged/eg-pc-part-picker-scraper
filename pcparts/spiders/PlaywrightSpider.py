@@ -16,6 +16,26 @@ class PlaywrightSpider(scrapy.Spider):
         is_in_stock=True,
     )
 
+    def __generate_url_with_query_params(self, url, page):
+        url_with_query_params = f"{url}?{self.page_keyword}={page}"
+        try:
+            for key, value in self.query_params.items():
+                url_with_query_params += f"&{key}={value}"
+        except AttributeError:
+            pass
+        return url_with_query_params
+
+    def start_requests(self):
+        for category, initial_url in self.start_urls.items():
+            metadata = self.initial_metadata.copy()
+            metadata.update(category=category)
+            yield scrapy.Request(
+                self.__generate_url_with_query_params(
+                    initial_url, metadata["page_number"]
+                ),
+                meta=metadata,
+            )
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         create_folder(f"{pcparts_settings.OUTPUT_DIR}/{self.name}")

@@ -2,13 +2,6 @@ import scrapy
 from .PlaywrightSpider import PlaywrightSpider
 
 
-def generate_url_with_page(url, page, is_in_stock=True):
-    url_with_query_params = f"{url}?page={page}"
-    if is_in_stock:
-        return f"{url_with_query_params}&stock=yes"
-    return url_with_query_params
-
-
 class EgpricesSpider(PlaywrightSpider):
     name = "EgPrices"
     start_urls = dict(
@@ -23,15 +16,9 @@ class EgpricesSpider(PlaywrightSpider):
         psu="https://www.egprices.com/en/category/computers/components/power-supplies",
         monitors="https://www.egprices.com/en/category/computers/computer-monitors",
     )
-
-    def start_requests(self):
-        for category, initial_url in self.start_urls.items():
-            metadata = self.initial_metadata.copy()
-            metadata.update(category=category)
-            yield scrapy.Request(
-                generate_url_with_page(initial_url, metadata["page_number"]),
-                meta=metadata,
-            )
+    query_params = dict(
+        stock="yes",
+    )
 
     def parse_price_float(self, price_str):
         if not price_str:
@@ -50,9 +37,6 @@ class EgpricesSpider(PlaywrightSpider):
         for product in response.css(
             'div.row.align-middle.collapse[style="min-height:80px"]'
         ):
-            print(
-                "something", product.css("div.small-9.medium-7.columns div::text").get()
-            )
             yield {
                 "name": product.css("div.small-9.medium-7.columns div::text").get(),
                 "price": self.parse_price_float(
