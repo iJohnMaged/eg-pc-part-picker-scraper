@@ -6,6 +6,7 @@ from pcparts.spiders.EgPrices import EgpricesSpider
 from pcparts.spiders.CompuArt import CompuartSpider
 from pcparts.spiders.ElbadrGroup import ElBadrGroupSpider
 from pcparts.spiders.MaximumHardware import MaximumHardwareSpider
+from pcparts.spiders.HighEnd import HighEndSpider
 
 
 def main():
@@ -14,6 +15,7 @@ def main():
         CompuartSpider,
         ElBadrGroupSpider,
         MaximumHardwareSpider,
+        HighEndSpider,
     ]
     crawlers = {}
     settings = Settings()
