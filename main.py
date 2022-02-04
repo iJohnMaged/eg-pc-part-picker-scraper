@@ -1,28 +1,18 @@
 from scrapy.crawler import CrawlerProcess
-from scrapy.settings import Settings
-from pcparts import settings as pcparts_settings
-
-from pcparts.spiders.EgPrices import EgpricesSpider
-from pcparts.spiders.CompuArt import CompuartSpider
-from pcparts.spiders.ElbadrGroup import ElBadrGroupSpider
-from pcparts.spiders.MaximumHardware import MaximumHardwareSpider
-from pcparts.spiders.HighEnd import HighEndSpider
+from scrapy.utils import project
+from scrapy import spiderloader
 
 
 def main():
-    spiders = [
-        EgpricesSpider,
-        CompuartSpider,
-        ElBadrGroupSpider,
-        MaximumHardwareSpider,
-        HighEndSpider,
-    ]
+    settings = project.get_project_settings()
+    spider_loader = spiderloader.SpiderLoader.from_settings(settings)
+    spiders = spider_loader.list()
+    spiders_classes = [spider_loader.load(name) for name in spiders]
+
     crawlers = {}
-    settings = Settings()
-    settings.setmodule(pcparts_settings)
     process = CrawlerProcess(settings=settings)
-    for spider in spiders:
-        crawlers[spider.name] = process.create_crawler(spider)
+    for spider_class in spiders_classes:
+        crawlers[spider_class.name] = process.create_crawler(spider_class)
     for crawler in crawlers.values():
         process.crawl(crawler)
     process.start()
