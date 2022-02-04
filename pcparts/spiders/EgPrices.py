@@ -19,11 +19,6 @@ class EgpricesSpider(PlaywrightSpider):
         stock="yes",
     )
 
-    def parse_price_float(self, price_str):
-        if not price_str:
-            return 0
-        return float(price_str.replace("EGP", "").replace(",", "").strip())
-
     def parse_product_image(self, product):
         image = product.css(
             "div.text-center.align-self-top.small-3.medium-2.columns img::attr(src)"
