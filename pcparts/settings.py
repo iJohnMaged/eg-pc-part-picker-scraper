@@ -7,6 +7,11 @@
 #     https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
 BOT_NAME = "pcparts"
 
 SPIDER_MODULES = ["pcparts.spiders"]
@@ -19,6 +24,8 @@ DOWNLOAD_HANDLERS = {
 
 TWISTED_REACTOR = "twisted.internet.asyncioreactor.AsyncioSelectorReactor"
 
+PLAYWRIGHT_DEFAULT_NAVIGATION_TIMEOUT = 120 * 1000
+
 FEED_EXPORT_ENCODING = "utf-8"
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
@@ -28,7 +35,7 @@ FEED_EXPORT_ENCODING = "utf-8"
 ROBOTSTXT_OBEY = True
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
-# CONCURRENT_REQUESTS = 32
+CONCURRENT_REQUESTS = 8
 
 # Configure a delay for requests for the same website (default: 0)
 # See https://docs.scrapy.org/en/latest/topics/settings.html#download-delay
@@ -72,7 +79,8 @@ ROBOTSTXT_OBEY = True
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
     "pcparts.pipelines.FormatPipeline": 0,
-    "pcparts.pipelines.CategoryPipeline": 1,
+    "pcparts.pipelines.DatabasePipeline": 1,
+    "pcparts.pipelines.LocalJsonPipeline": 2,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
@@ -97,4 +105,13 @@ ITEM_PIPELINES = {
 # HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
 OUTPUT_DIR = "scraped_data"
 
-LOG_LEVEL = "ERROR"
+# LOG_LEVEL = "ERROR"
+
+DATABASE = {
+    "drivername": "postgresql+psycopg2",
+    "host": os.environ.get("DB_HOST"),
+    "port": os.environ.get("DB_PORT"),
+    "username": os.environ.get("DB_USER"),
+    "password": os.environ.get("DB_PASSWORD"),
+    "database": os.environ.get("DB_DATABASE"),
+}

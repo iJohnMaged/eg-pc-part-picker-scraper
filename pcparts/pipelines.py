@@ -8,6 +8,16 @@ from typing import Union
 from scrapy.exceptions import DropItem
 from urllib.parse import quote
 from pcparts import settings as pcparts_settings
+from pcparts.models import (
+    db_connect,
+    create_all_metadata,
+    Part,
+    get_all_stores,
+    get_all_categories,
+)
+from sqlalchemy.dialects.postgresql import insert
+
+from sqlalchemy.orm import sessionmaker
 
 
 class FormatPipeline:
@@ -33,7 +43,59 @@ class FormatPipeline:
         return item
 
 
-class CategoryPipeline:
+class DatabasePipeline:
+    categories = {}
+    stores = {}
+    parts = []
+
+    def open_spider(self, _):
+        self.engine = db_connect()
+        create_all_metadata(self.engine)
+        self.Session = sessionmaker(bind=self.engine)
+        session = self.Session()
+        self.stores = get_all_stores(session)
+        self.categories = get_all_categories(session)
+        session.close()
+
+    def process_item(self, item, spider):
+        item["store"] = self.stores[spider.store_name]
+        item["category"] = self.categories[item["category"]]
+        item["imageUrl"] = item.pop("image")
+        for other_item in self.parts:
+            if (
+                other_item["store"] == item["store"]
+                and other_item["name"] == item["name"]
+                and other_item["category"] == item["category"]
+            ):
+                raise DropItem
+        self.parts.append(item)
+        return item
+
+    def close_spider(self, _):
+        if not self.parts:
+            return
+        try:
+            # TODO: start a transaction and mark previous results from this spider with recently_scrapped = False
+            # And add recently_scrapped = True to current items
+            session = self.Session()
+            insert_stmt = insert(Part).values(self.parts)
+            update_stmt = insert_stmt.on_conflict_do_update(
+                constraint="unique_part",
+                set_={
+                    "price": insert_stmt.excluded.price,
+                },
+            )
+            result = session.execute(update_stmt)
+            print(f"{result = }")
+            session.commit()
+        except Exception as e:
+            print("INSERTION ERROR: ", e)
+            session.rollback()
+        finally:
+            session.close()
+
+
+class LocalJsonPipeline:
     def process_item(self, item, spider):
         filename = (
             f"{pcparts_settings.OUTPUT_DIR}/{spider.name}/{item['category']}.json"
