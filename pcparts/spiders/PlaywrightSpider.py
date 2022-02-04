@@ -2,6 +2,7 @@ import scrapy
 from pcparts.io_helper import create_folder
 from scrapy_playwright.page import PageCoroutine
 from pcparts import settings as pcparts_settings
+import re
 
 
 class PlaywrightSpider(scrapy.Spider):
@@ -9,14 +10,15 @@ class PlaywrightSpider(scrapy.Spider):
         playwright=True,
         playwright_include_page=True,
         playwright_page_coroutines=[
+            PageCoroutine("route", re.compile(".google."), lambda route: route.abort()),
+            PageCoroutine("wait_for_load_state", "domcontentloaded"),
             PageCoroutine("evaluate", "window.scrollBy(0, document.body.scrollHeight)"),
-            PageCoroutine("wait_for_load_state", "networkidle"),
         ],
         page_number=1,
-        is_in_stock=True,
     )
+    page_keyword = "page"
 
-    def __generate_url_with_query_params(self, url, page):
+    def __generate_url_with_query_params(self, url: str, page: int) -> str:
         url_with_query_params = f"{url}?{self.page_keyword}={page}"
         try:
             for key, value in self.query_params.items():
