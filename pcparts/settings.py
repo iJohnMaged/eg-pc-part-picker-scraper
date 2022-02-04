@@ -71,7 +71,8 @@ ROBOTSTXT_OBEY = True
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    "pcparts.pipelines.CategoryPipeline": 300,
+    "pcparts.pipelines.FormatPipeline": 0,
+    "pcparts.pipelines.CategoryPipeline": 1,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
@@ -95,3 +96,5 @@ ITEM_PIPELINES = {
 # HTTPCACHE_IGNORE_HTTP_CODES = []
 # HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
 OUTPUT_DIR = "scraped_data"
+
+LOG_LEVEL = "ERROR"
