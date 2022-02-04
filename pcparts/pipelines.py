@@ -4,7 +4,33 @@
 # See: https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 import json
 import os
+from typing import Union
+from scrapy.exceptions import DropItem
+from urllib.parse import quote
 from pcparts import settings as pcparts_settings
+
+
+class FormatPipeline:
+    def __quote(self, url: str) -> str:
+        return quote(url, safe="/:?=& ")
+
+    def __parse_price_float(self, price_str: str) -> Union[float, None]:
+        try:
+            return float(price_str.replace("EGP", "").replace(",", "").strip())
+        except (ValueError, AttributeError):
+            return None
+
+    def process_item(self, item, _):
+        item["price"] = self.__parse_price_float(item["price"])
+        item["url"] = self.__quote(item["url"])
+        item["image"] = self.__quote(item["image"])
+        item["category"] = item["category"].lower()
+        item["name"] = item["name"].lower()
+
+        if not item["price"]:
+            raise DropItem
+
+        return item
 
 
 class CategoryPipeline:
