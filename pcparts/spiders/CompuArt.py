@@ -1,5 +1,3 @@
-from urllib.parse import quote
-import scrapy
 from .PlaywrightSpider import PlaywrightSpider
 
 
@@ -20,14 +18,6 @@ class CompuartSpider(PlaywrightSpider):
     # Fq is query param for in-stock products
     query_params = dict(fq=1)
 
-    def encode_url(self, url):
-        return quote(url, safe="/:?=&")
-
-    def parse_price_float(self, price_str):
-        if price_str is None:
-            return 0
-        return float(price_str.replace("EGP", "").replace(",", "").strip())
-
     async def parse(self, response):
         for product in response.css(
             "div.main-products.product-grid div.product-layout"
@@ -35,19 +25,15 @@ class CompuartSpider(PlaywrightSpider):
             image_main_tag = product.css("a.product-img img")
             yield {
                 "category": response.meta["category"],
-                "image": self.encode_url(
-                    image_main_tag.attrib.get(
-                        "srcset", image_main_tag.attrib.get("data-srcset")
-                    )
-                    .split(",")[-1]
-                    .strip()
-                    .split(" ")[0]
-                ),
+                "image": image_main_tag.attrib.get(
+                    "srcset", image_main_tag.attrib.get("data-srcset")
+                )
+                .split(",")[-1]
+                .strip()
+                .split(" ")[0],
                 "name": product.css("div.name a::text").get(),
-                "price": self.parse_price_float(
-                    product.css("div.price span::text").get()
-                ),
-                "url": self.encode_url(product.css("div.name a::attr(href)").get()),
+                "price": product.css("div.price span::text").get(),
+                "url": product.css("div.name a::attr(href)").get(),
             }
         end_of_products = response.css("div.ias-noneleft").get()
         if end_of_products is not None:

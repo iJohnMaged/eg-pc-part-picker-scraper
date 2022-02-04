@@ -1,4 +1,3 @@
-import scrapy
 from .PlaywrightSpider import PlaywrightSpider
 
 
@@ -39,11 +38,9 @@ class EgpricesSpider(PlaywrightSpider):
         ):
             yield {
                 "name": product.css("div.small-9.medium-7.columns div::text").get(),
-                "price": self.parse_price_float(
-                    product.css(
-                        "div.small-6.medium-12.text-left.medium-text-center.columns::text"
-                    ).get()
-                ),
+                "price": product.css(
+                    "div.small-6.medium-12.text-left.medium-text-center.columns::text"
+                ).get(),
                 "image": self.parse_product_image(product),
                 "url": response.urljoin(
                     product.css("div.small-9.medium-7.columns a::attr(href)").get()

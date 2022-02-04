@@ -1,4 +1,3 @@
-import scrapy
 from .PlaywrightSpider import PlaywrightSpider
 
 
