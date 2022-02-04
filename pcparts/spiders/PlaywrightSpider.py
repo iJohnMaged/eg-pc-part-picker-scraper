@@ -6,7 +6,7 @@ import re
 
 
 class PlaywrightSpider(scrapy.Spider):
-    required_attrs = ["start_urls", "query_params"]
+    required_attrs = ["start_urls"]
     initial_metadata = dict(
         playwright=True,
         playwright_include_page=True,
