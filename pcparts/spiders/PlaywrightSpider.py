@@ -11,8 +11,12 @@ class PlaywrightSpider(scrapy.Spider):
         playwright=True,
         playwright_include_page=True,
         playwright_page_coroutines=[
-            PageCoroutine("route", re.compile(".google."), lambda route: route.abort()),
-            PageCoroutine("wait_for_load_state", "domcontentloaded", timeout=60),
+            PageCoroutine(
+                "route",
+                re.compile(".+google.+|.+facebook.+"),
+                lambda route: route.abort(),
+            ),
+            PageCoroutine("wait_for_load_state", "networkidle", timeout=60 * 1000),
             PageCoroutine("evaluate", "window.scrollBy(0, document.body.scrollHeight)"),
         ],
         page_number=1,

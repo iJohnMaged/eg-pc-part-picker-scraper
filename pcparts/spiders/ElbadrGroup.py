@@ -35,7 +35,8 @@ class ElBadrGroupSpider(PlaywrightSpider):
                 "url": product.css("div.name a::attr(href)").get(),
             }
         end_of_products = response.css("div.ias-noneleft").get()
-        if end_of_products is not None:
+
+        if end_of_products is None:
             current_page_number = response.meta.get("page_number")
             current_category = response.meta.get("category")
             next_page_meta = response.meta.copy()
