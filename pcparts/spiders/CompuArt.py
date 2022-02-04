@@ -2,7 +2,10 @@ from .PlaywrightSpider import PlaywrightSpider
 
 
 class CompuartSpider(PlaywrightSpider):
-    name = "CompuArt"
+    name = "CompuArtSpider"
+    store_name = "Compu Art"
+    store_url = "https://www.compuartstore.com"
+
     start_urls = dict(
         ram="https://www.compuartstore.com/core-components/memory",
         gpu="https://www.compuartstore.com/core-components/video-cards",

@@ -2,7 +2,10 @@ from .PlaywrightSpider import PlaywrightSpider
 
 
 class EgpricesSpider(PlaywrightSpider):
-    name = "EgPrices"
+    name = "EgPricesSpider"
+    store_name = "EGPrices"
+    store_url = "https://www.egprices.com/en/"
+
     start_urls = dict(
         cooling="https://www.egprices.com/en/category/computers/computer-components-hardware/fans-cooling-systems",
         ram="https://www.egprices.com/en/category/computers/components/memory/desktop",

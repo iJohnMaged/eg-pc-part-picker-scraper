@@ -2,7 +2,10 @@ from .PlaywrightSpider import PlaywrightSpider
 
 
 class MaximumHardwareSpider(PlaywrightSpider):
-    name = "MaximumHardware"
+    name = "MaximumHardwareSpider"
+    store_name = "Maximum Hardware"
+    store_url = "https://www.maximumhardware.store"
+
     start_urls = dict(
         cpu="https://maximumhardware.store/processors",
         motherboards="https://maximumhardware.store/motherboards",

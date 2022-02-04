@@ -2,7 +2,10 @@ from .PlaywrightSpider import PlaywrightSpider
 
 
 class HighEndSpider(PlaywrightSpider):
-    name = "HighEnd"
+    name = "HighEndSpider"
+    store_name = "High End"
+    store_url = "https://highendstore.net"
+
     query_params = dict(fq=1, limit=100)
     start_urls = dict(
         cpu="https://highendstore.net/index.php?route=product/category&path=477",

@@ -6,6 +6,9 @@ import urllib.parse
 
 class SigmaComputerSpider(PlaywrightSpider):
     name = "SigmaComputerSpider"
+    store_name = "Sigma Computer"
+    store_url = "https://www.sigma-computer.com"
+
     base_url = "https://www.sigma-computer.com"
     start_urls = dict(
         motherbaords="https://www.sigma-computer.com/subcategory?id=1&cname=Desktop&id2=1&scname=Motherboard",

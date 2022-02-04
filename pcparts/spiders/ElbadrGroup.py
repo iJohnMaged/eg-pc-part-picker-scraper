@@ -2,7 +2,10 @@ from .PlaywrightSpider import PlaywrightSpider
 
 
 class ElBadrGroupSpider(PlaywrightSpider):
-    name = "ElbadrGroup"
+    name = "ElBadrGroupSpider"
+    store_name = "El Badr Group"
+    store_url = "https://elbadrgroupeg.store"
+
     start_urls = dict(
         ram="https://elbadrgroupeg.store/ram",
         gpu="https://elbadrgroupeg.store/vga",
