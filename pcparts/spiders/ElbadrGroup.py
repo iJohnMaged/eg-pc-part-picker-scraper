@@ -43,7 +43,7 @@ class ElBadrGroupSpider(PlaywrightSpider):
                 page_number=current_page_number + 1,
             )
             yield response.follow(
-                self.__generate_url_with_query_params(
+                self.generate_url_with_query_params(
                     self.start_urls[current_category],
                     current_page_number + 1,
                 ),

@@ -12,14 +12,14 @@ class PlaywrightSpider(scrapy.Spider):
         playwright_include_page=True,
         playwright_page_coroutines=[
             PageCoroutine("route", re.compile(".google."), lambda route: route.abort()),
-            PageCoroutine("wait_for_load_state", "domcontentloaded"),
+            PageCoroutine("wait_for_load_state", "domcontentloaded", timeout=60),
             PageCoroutine("evaluate", "window.scrollBy(0, document.body.scrollHeight)"),
         ],
         page_number=1,
     )
     page_keyword = "page"
 
-    def __generate_url_with_query_params(self, url: str, page: int) -> str:
+    def generate_url_with_query_params(self, url: str, page: int) -> str:
         url_with_query_params = f"{url}?{self.page_keyword}={page}"
         try:
             for key, value in self.query_params.items():
@@ -33,7 +33,7 @@ class PlaywrightSpider(scrapy.Spider):
             metadata = self.initial_metadata.copy()
             metadata.update(category=category)
             yield scrapy.Request(
-                self.__generate_url_with_query_params(
+                self.generate_url_with_query_params(
                     initial_url, metadata["page_number"]
                 ),
                 meta=metadata,
@@ -41,8 +41,8 @@ class PlaywrightSpider(scrapy.Spider):
 
     def __assert_initial_values(self):
         for attr in self.required_attrs:
-            assert (
-                getattr(self, attr, None) is not None
+            assert not not getattr(
+                self, attr, None
             ), f"{attr} is required in {self.name}"
 
     def __init__(self, *args, **kwargs):
