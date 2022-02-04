@@ -6,6 +6,7 @@ import re
 
 
 class PlaywrightSpider(scrapy.Spider):
+    required_attrs = ["start_urls", "query_params"]
     initial_metadata = dict(
         playwright=True,
         playwright_include_page=True,
@@ -38,8 +39,15 @@ class PlaywrightSpider(scrapy.Spider):
                 meta=metadata,
             )
 
+    def __assert_initial_values(self):
+        for attr in self.required_attrs:
+            assert (
+                getattr(self, attr, None) is not None
+            ), f"{attr} is required in {self.name}"
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.__assert_initial_values()
         create_folder(f"{pcparts_settings.OUTPUT_DIR}/{self.name}")
         for category, _ in self.start_urls.items():
             with open(
