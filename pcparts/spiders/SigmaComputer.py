@@ -9,6 +9,14 @@ class SigmaComputerSpider(PlaywrightSpider):
     base_url = "https://www.sigma-computer.com"
     start_urls = dict(
         motherbaords="https://www.sigma-computer.com/subcategory?id=1&cname=Desktop&id2=1&scname=Motherboard",
+        gpu="https://www.sigma-computer.com/subcategory?id=1&cname=Desktop&id2=2&scname=Graphic%20Card",
+        ram="https://www.sigma-computer.com/subcategory?id=1&cname=Desktop&id2=3&scname=Ram",
+        cpu="https://www.sigma-computer.com/subcategory?id=1&cname=Desktop&id2=4&scname=Processors",
+        case="https://www.sigma-computer.com/subcategory?id=1&cname=Desktop&id2=29&scname=Computer%20Case",
+        psu="https://www.sigma-computer.com/subcategory?id=1&cname=Desktop&id2=61&scname=Power%20Supply",
+        monitors="https://www.sigma-computer.com/category?id=4&cname=Monitors",
+        cooling="https://www.sigma-computer.com/subcategory?id=6&cname=Accessories&id2=11&scname=PC%20Cooling",
+        storage="https://www.sigma-computer.com/subcategory?id=3&cname=Storage&id2=7&scname=SSD",
     )
     set_in_stock_url = "https://www.sigma-computer.com/setout_of_stock?set_con=close"
     cookies = {}
