@@ -108,10 +108,10 @@ OUTPUT_DIR = "scraped_data"
 # LOG_LEVEL = "ERROR"
 
 DATABASE = {
-    "drivername": "postgresql+psycopg2",
-    "host": os.environ.get("DB_HOST"),
-    "port": os.environ.get("DB_PORT"),
-    "username": os.environ.get("DB_USER"),
-    "password": os.environ.get("DB_PASSWORD"),
-    "database": os.environ.get("DB_DATABASE"),
+    "drivername": os.environ.get("DB_DRIVER"),
+    "host": os.environ.get("DB_HOST", None),
+    "port": os.environ.get("DB_PORT", None),
+    "username": os.environ.get("DB_USER", None),
+    "password": os.environ.get("DB_PASSWORD", None),
+    "database": os.environ.get("DB_DATABASE", None),
 }
