@@ -35,7 +35,7 @@ class FormatPipeline:
         item["url"] = self.__quote(item["url"])
         item["image"] = self.__quote(item["image"])
         item["category"] = item["category"].lower()
-        item["name"] = item["name"].lower()
+        item["name"] = item["name"]
 
         if not item["price"]:
             raise DropItem
