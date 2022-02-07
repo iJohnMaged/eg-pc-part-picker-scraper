@@ -19,7 +19,11 @@ class SigmaComputerSpider(PlaywrightSpider):
         psu="https://www.sigma-computer.com/subcategory?id=1&cname=Desktop&id2=61&scname=Power%20Supply",
         monitors="https://www.sigma-computer.com/category?id=4&cname=Monitors",
         cooling="https://www.sigma-computer.com/subcategory?id=6&cname=Accessories&id2=11&scname=PC%20Cooling",
-        storage="https://www.sigma-computer.com/subcategory?id=3&cname=Storage&id2=7&scname=SSD",
+        storage=[
+            "https://www.sigma-computer.com/subcategory?id=3&cname=Storage&id2=7&scname=SSD",
+            "https://www.sigma-computer.com/subcategory?id=3&cname=Storage&id2=6&scname=Internal%20Hard",
+            "https://www.sigma-computer.com/subcategory?id=3&cname=Storage&id2=9&scname=M.2",
+        ],
     )
     set_in_stock_url = "https://www.sigma-computer.com/setout_of_stock?set_con=close"
     cookies = {}
@@ -41,14 +45,22 @@ class SigmaComputerSpider(PlaywrightSpider):
         for category, initial_url in self.start_urls.items():
             metadata = self.initial_metadata.copy()
             metadata.update(category=category)
-            yield scrapy.Request(
-                self.generate_url_with_query_params(
-                    initial_url, metadata["page_number"]
-                ),
-                cookies=self.cookies,
-                meta=metadata,
-                callback=self.parse,
-            )
+            if isinstance(initial_url, list):
+                for url in initial_url:
+                    yield scrapy.Request(
+                        url,
+                        meta=metadata,
+                        cookies=self.cookies,
+                    )
+            else:
+                yield scrapy.Request(
+                    self.generate_url_with_query_params(
+                        initial_url, metadata["page_number"]
+                    ),
+                    cookies=self.cookies,
+                    meta=metadata,
+                    callback=self.parse,
+                )
 
     async def parse(self, response):
         for product in response.css("div.products-list div.product-layout"):
