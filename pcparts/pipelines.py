@@ -4,6 +4,7 @@
 # See: https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 import json
 import os
+from re import X
 from typing import Union
 from scrapy.exceptions import DropItem
 from urllib.parse import quote
@@ -62,6 +63,7 @@ class DatabasePipeline:
         item_clone["store"] = self.stores[spider.store_name]
         item_clone["category"] = self.categories[item_clone["category"]]
         item_clone["imageUrl"] = item_clone.pop("image")
+        item_clone["recently_scraped"] = True
         for other_item in self.parts:
             if (
                 other_item["store"] == item_clone["store"]
@@ -72,13 +74,28 @@ class DatabasePipeline:
         self.parts.append(item_clone)
         return item
 
-    def close_spider(self, _):
+    def close_spider(self, spider):
         if not self.parts:
             return
         try:
-            # TODO: start a transaction and mark previous results from this spider with recently_scrapped = False
-            # And add recently_scrapped = True to current items
+            # TODO: add a constaint and only update based on success %?
             session = self.Session()
+            # Update recently_scraped to be False on items in the same store
+            old_items = (
+                session.query(Part)
+                .filter(
+                    Part.store == self.stores[spider.store_name],
+                    Part.recently_scraped == True,
+                )
+                .all()
+            )
+
+            for old_item in old_items:
+                old_item.recently_scraped = False
+
+            session.flush()
+
+            # Insert new items
             insert_stmt = insert(Part).values(self.parts)
             update_stmt = insert_stmt.on_conflict_do_update(
                 constraint="unique_part",

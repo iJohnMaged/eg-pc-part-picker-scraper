@@ -1,4 +1,5 @@
 from sqlalchemy import (
+    Boolean,
     Float,
     ForeignKey,
     create_engine,
@@ -54,6 +55,7 @@ class Part(DeclarativeBase):
     price = Column(Float)
     url = Column(String)
     imageUrl = Column(String)
+    recently_scraped = Column(Boolean)
     store = Column(Integer, ForeignKey("Store.id"))
     category = Column(Integer, ForeignKey("Category.id"))
 
