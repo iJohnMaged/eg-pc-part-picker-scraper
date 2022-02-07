@@ -58,17 +58,18 @@ class DatabasePipeline:
         session.close()
 
     def process_item(self, item, spider):
-        item["store"] = self.stores[spider.store_name]
-        item["category"] = self.categories[item["category"]]
-        item["imageUrl"] = item.pop("image")
+        item_clone = item.copy()
+        item_clone["store"] = self.stores[spider.store_name]
+        item_clone["category"] = self.categories[item_clone["category"]]
+        item_clone["imageUrl"] = item_clone.pop("image")
         for other_item in self.parts:
             if (
-                other_item["store"] == item["store"]
-                and other_item["name"] == item["name"]
-                and other_item["category"] == item["category"]
+                other_item["store"] == item_clone["store"]
+                and other_item["name"] == item_clone["name"]
+                and other_item["category"] == item_clone["category"]
             ):
                 raise DropItem
-        self.parts.append(item)
+        self.parts.append(item_clone)
         return item
 
     def close_spider(self, _):
