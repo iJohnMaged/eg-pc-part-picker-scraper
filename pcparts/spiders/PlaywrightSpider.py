@@ -17,7 +17,6 @@ class PlaywrightSpider(scrapy.Spider):
                 lambda route: route.abort(),
             ),
             PageCoroutine("wait_for_load_state", "networkidle", timeout=60 * 1000),
-            PageCoroutine("evaluate", "window.scrollBy(0, document.body.scrollHeight)"),
         ],
         page_number=1,
     )
@@ -36,12 +35,21 @@ class PlaywrightSpider(scrapy.Spider):
         for category, initial_url in self.start_urls.items():
             metadata = self.initial_metadata.copy()
             metadata.update(category=category)
-            yield scrapy.Request(
-                self.generate_url_with_query_params(
-                    initial_url, metadata["page_number"]
-                ),
-                meta=metadata,
-            )
+            if isinstance(initial_url, list):
+                for url in initial_url:
+                    yield scrapy.Request(
+                        self.generate_url_with_query_params(
+                            url, metadata["page_number"]
+                        ),
+                        meta=metadata,
+                    )
+            else:
+                yield scrapy.Request(
+                    self.generate_url_with_query_params(
+                        initial_url, metadata["page_number"]
+                    ),
+                    meta=metadata,
+                )
 
     def __assert_initial_values(self):
         for attr in self.required_attrs:

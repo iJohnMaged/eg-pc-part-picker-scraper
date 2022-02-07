@@ -11,12 +11,21 @@ class HighEndSpider(PlaywrightSpider):
         cpu="https://highendstore.net/index.php?route=product/category&path=477",
         motherboards="https://highendstore.net/index.php?route=product/category&path=476",
         gpu="https://highendstore.net/index.php?route=product/category&path=475",
-        memory="https://highendstore.net/index.php?route=product/category&path=472",
-        storage="https://highendstore.net/index.php?route=product/category&path=482",
+        ram="https://highendstore.net/index.php?route=product/category&path=472",
         monitors="https://highendstore.net/index.php?route=product/category&path=480",
         psu="https://highendstore.net/index.php?route=product/category&path=478",
         cooling="https://highendstore.net/index.php?route=product/category&path=471",
         case="https://highendstore.net/index.php?route=product/category&path=473",
+        storage=[
+            "https://highendstore.net/index.php?route=product/category&path=482",
+            "https://highendstore.net/index.php?route=product/category&path=481",
+        ],
+        accessories=[
+            "https://highendstore.net/index.php?route=product/category&path=484",
+            "https://highendstore.net/index.php?route=product/category&path=474",
+            "https://highendstore.net/index.php?route=product/category&path=479",
+            "https://highendstore.net/index.php?route=product/category&path=485",
+        ],
     )
 
     async def parse(self, response):

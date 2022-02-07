@@ -11,12 +11,19 @@ class MaximumHardwareSpider(PlaywrightSpider):
         motherboards="https://maximumhardware.store/motherboards",
         ram="https://maximumhardware.store/memory",
         gpu="https://maximumhardware.store/graphic-card",
-        storage="https://maximumhardware.store/ssd",
+        storage=[
+            "https://maximumhardware.store/ssd",
+            "https://maximumhardware.store/hard-disks",
+        ],
         cooling="https://maximumhardware.store/fans-pc-cooling",
         psu="https://maximumhardware.store/power-supply",
         case="https://maximumhardware.store/cases",
         monitors="https://maximumhardware.store/monitors",
-        accessories="https://maximumhardware.store/accessories",
+        accessories=[
+            "https://maximumhardware.store/accessories",
+            "https://maximumhardware.store/headphones-speakers",
+            "https://maximumhardware.store/keyboard-mouse",
+        ],
     )
     query_params = dict(
         limit=100,

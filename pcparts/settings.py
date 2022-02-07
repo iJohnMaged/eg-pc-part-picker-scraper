@@ -79,7 +79,7 @@ CONCURRENT_REQUESTS = 8
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
     "pcparts.pipelines.FormatPipeline": 0,
-    "pcparts.pipelines.DatabasePipeline": 1,
+    # "pcparts.pipelines.DatabasePipeline": 1,
     "pcparts.pipelines.LocalJsonPipeline": 2,
 }
 
