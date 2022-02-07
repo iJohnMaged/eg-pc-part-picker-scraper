@@ -3,3 +3,4 @@ __pycache__/
 .DS_store
 .env
 venv/
+scrapy_output.txt

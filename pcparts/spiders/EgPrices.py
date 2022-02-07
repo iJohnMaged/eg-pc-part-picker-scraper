@@ -1,7 +1,7 @@
-from .PlaywrightSpider import PlaywrightSpider
+from .BaseSpider import BaseSpider
 
 
-class EgpricesSpider(PlaywrightSpider):
+class EgpricesSpider(BaseSpider):
     name = "EgPricesSpider"
     store_name = "EGPrices"
     store_url = "https://www.egprices.com/en/"
@@ -30,7 +30,20 @@ class EgpricesSpider(PlaywrightSpider):
             return ""
         return image.replace("thumb", "large")
 
-    async def parse(self, response):
+    def get_next_page(self, response):
+        next_page = response.xpath(
+            "//i[@class='fa fa-angle-double-right']/../@href"
+        ).get()
+        if next_page is not None:
+            metadata = response.meta.copy()
+            metadata.update(page_number=metadata["page_number"] + 1)
+            yield response.follow(
+                response.urljoin(next_page),
+                meta=metadata,
+            )
+        return None
+
+    def parse(self, response):
         for product in response.css(
             'div.row.align-middle.collapse[style="min-height:80px"]'
         ):
@@ -46,14 +59,4 @@ class EgpricesSpider(PlaywrightSpider):
                 "category": response.meta["category"],
             }
 
-        next_page = response.xpath(
-            "//i[@class='fa fa-angle-double-right']/../@href"
-        ).get()
-
-        if next_page is not None:
-            metadata = response.meta.copy()
-            metadata.update(page_number=metadata["page_number"] + 1)
-            yield response.follow(
-                response.urljoin(next_page),
-                meta=metadata,
-            )
+        yield from self.get_next_page(response)

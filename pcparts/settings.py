@@ -17,14 +17,6 @@ BOT_NAME = "pcparts"
 SPIDER_MODULES = ["pcparts.spiders"]
 NEWSPIDER_MODULE = "pcparts.spiders"
 
-DOWNLOAD_HANDLERS = {
-    "http": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
-    "https": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
-}
-
-TWISTED_REACTOR = "twisted.internet.asyncioreactor.AsyncioSelectorReactor"
-
-PLAYWRIGHT_DEFAULT_NAVIGATION_TIMEOUT = 120 * 1000
 
 FEED_EXPORT_ENCODING = "utf-8"
 
@@ -79,7 +71,7 @@ CONCURRENT_REQUESTS = 8
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
     "pcparts.pipelines.FormatPipeline": 0,
-    "pcparts.pipelines.DatabasePipeline": 1,
+    # "pcparts.pipelines.DatabasePipeline": 1,
     "pcparts.pipelines.LocalJsonPipeline": 2,
 }
 
@@ -103,9 +95,13 @@ ITEM_PIPELINES = {
 # HTTPCACHE_DIR = 'httpcache'
 # HTTPCACHE_IGNORE_HTTP_CODES = []
 # HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
+
 OUTPUT_DIR = "scraped_data"
+LOG_STDOUT = True
+LOG_FILE = 'scrapy_output.txt'
 
 # LOG_LEVEL = "ERROR"
+
 
 DATABASE = {
     "drivername": os.environ.get("DB_DRIVER"),

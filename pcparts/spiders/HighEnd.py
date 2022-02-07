@@ -1,7 +1,7 @@
-from .PlaywrightSpider import PlaywrightSpider
+from .JournalPaginationSpider import JournalPaginationSpider
 
 
-class HighEndSpider(PlaywrightSpider):
+class HighEndSpider(JournalPaginationSpider):
     name = "HighEndSpider"
     store_name = "High End"
     store_url = "https://highendstore.net"
@@ -28,7 +28,7 @@ class HighEndSpider(PlaywrightSpider):
         ],
     )
 
-    async def parse(self, response):
+    def parse(self, response):
         for product in response.css("div.main-products-wrapper div.product-layout"):
             image_container = product.css("div.image")
             image = (
@@ -47,19 +47,4 @@ class HighEndSpider(PlaywrightSpider):
                 "url": url,
             }
 
-        end_of_products = response.css("div.ias-noneleft").get()
-        # if end of products is none means we've more pages to go
-        if end_of_products is None:
-            current_page_number = response.meta.get("page_number")
-            current_category = response.meta.get("category")
-            next_page_meta = response.meta.copy()
-            next_page_meta.update(
-                page_number=current_page_number + 1,
-            )
-            yield response.follow(
-                self.generate_url_with_query_params(
-                    self.start_urls[current_category],
-                    current_page_number + 1,
-                ),
-                meta=next_page_meta,
-            )
+        yield from self.get_next_page(response)

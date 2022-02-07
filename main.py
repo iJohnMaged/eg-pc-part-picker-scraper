@@ -39,6 +39,7 @@ def init_db(spider_classes):
     if categories_to_insert:
         session.bulk_insert_mappings(Category, categories_to_insert)
     session.commit()
+    session.close()
     
 
 def main():
