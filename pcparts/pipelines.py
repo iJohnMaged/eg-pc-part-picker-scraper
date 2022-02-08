@@ -4,10 +4,9 @@
 # See: https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 import json
 import os
-from re import X
 from typing import Union
 from scrapy.exceptions import DropItem
-from urllib.parse import quote
+from urllib.parse import quote, unquote
 from pcparts import settings as pcparts_settings
 from pcparts.models import (
     db_connect,
@@ -33,8 +32,10 @@ class FormatPipeline:
 
     def process_item(self, item, _):
         item["price"] = self.__parse_price_float(item["price"])
-        item["url"] = self.__quote(item["url"])
-        item["image"] = self.__quote(item["image"])
+        if unquote(item["url"]) == item["url"]:
+            item["url"] = self.__quote(item["url"])
+        if unquote(item["image"]) == item["image"]:
+            item["image"] = self.__quote(item["image"])
         item["category"] = item["category"].lower()
         item["name"] = item["name"]
 
@@ -96,6 +97,7 @@ class DatabasePipeline:
             session.flush()
 
             # Insert new items
+            # TODO: for now no need for the update_on_conflict since we are setting recently_scraped to false.
             insert_stmt = insert(Part).values(self.parts)
             update_stmt = insert_stmt.on_conflict_do_update(
                 constraint="unique_part",
