@@ -7,8 +7,17 @@
 #     https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 
+import sys
 import os
+import django
 from dotenv import load_dotenv
+
+# Django
+sys.path.append("../PcBuilder")
+os.environ["DJANGO_SETTINGS_MODULE"] = "PcBuilder.settings"
+
+django.setup()
+
 
 load_dotenv()
 
@@ -97,8 +106,8 @@ ITEM_PIPELINES = {
 # HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
 
 OUTPUT_DIR = "scraped_data"
-LOG_STDOUT = True
-LOG_FILE = 'scrapy_output.txt'
+# LOG_STDOUT = True
+# LOG_FILE = 'scrapy_output.txt'
 
 # LOG_LEVEL = "ERROR"
 

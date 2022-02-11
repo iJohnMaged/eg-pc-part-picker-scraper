@@ -8,16 +8,8 @@ from typing import Union
 from scrapy.exceptions import DropItem
 from urllib.parse import quote, unquote
 from pcparts import settings as pcparts_settings
-from pcparts.models import (
-    db_connect,
-    create_all_metadata,
-    Part,
-    get_all_stores,
-    get_all_categories,
-)
-from sqlalchemy.dialects.postgresql import insert
 
-from sqlalchemy.orm import sessionmaker
+from ScrapedItems.models import Component, Store, Category
 
 
 class FormatPipeline:
@@ -51,25 +43,20 @@ class DatabasePipeline:
     parts = []
 
     def open_spider(self, _):
-        self.engine = db_connect()
-        create_all_metadata(self.engine)
-        self.Session = sessionmaker(bind=self.engine)
-        session = self.Session()
-        self.stores = get_all_stores(session)
-        self.categories = get_all_categories(session)
-        session.close()
+        self.stores = {store.name: store.id for store in Store.objects.all()}
+        self.categories = {category.name: category.id for category in Category.objects.all()}
 
     def process_item(self, item, spider):
         item_clone = item.copy()
-        item_clone["store"] = self.stores[spider.store_name]
-        item_clone["category"] = self.categories[item_clone["category"]]
-        item_clone["imageUrl"] = item_clone.pop("image")
+        item_clone["store_id"] = self.stores[spider.store_name]
+        item_clone["category_id"] = self.categories[item_clone.pop("category")]
         item_clone["recently_scraped"] = True
         for other_item in self.parts:
+            # Shortcut dupe items from scraped data
             if (
-                other_item["store"] == item_clone["store"]
+                other_item["store_id"] == item_clone["store_id"]
                 and other_item["name"] == item_clone["name"]
-                and other_item["category"] == item_clone["category"]
+                and other_item["category_id"] == item_clone["category_id"]
             ):
                 raise DropItem
         self.parts.append(item_clone)
@@ -78,43 +65,49 @@ class DatabasePipeline:
     def close_spider(self, spider):
         if not self.parts:
             return
-        try:
-            # TODO: add a constaint and only update based on success %?
-            session = self.Session()
-            # Update recently_scraped to be False on items in the same store
-            old_items = (
-                session.query(Part)
-                .filter(
-                    Part.store == self.stores[spider.store_name],
-                    Part.recently_scraped == True,
-                )
-                .all()
-            )
+        
+        store_id = self.stores[spider.store_name]
+        
+        Component.objects.filter(store_id=store_id).update(recently_scraped=False)
 
-            for old_item in old_items:
-                old_item.recently_scraped = False
+        records_to_update = []
+        records_to_create = []
 
-            session.flush()
+        records = [
+            {
+                "id": Component.objects.filter(
+                    category_id=part["category_id"],
+                    store_id=part["store_id"],
+                    name=part["name"],
+                    url=part["url"],
+                ).first().id
+                if Component.objects.filter(
+                    category_id=part["category_id"],
+                    store_id=part["store_id"],
+                    name=part["name"],
+                ).first() is not None else None, **part
+            }
+            for part in self.parts
+        ]
 
-            # Insert new items
-            # TODO: for now no need for the update_on_conflict since we are setting recently_scraped to false.
-            insert_stmt = insert(Part).values(self.parts)
-            update_stmt = insert_stmt.on_conflict_do_update(
-                constraint="unique_part",
-                set_={
-                    "price": insert_stmt.excluded.price,
-                },
-            )
-            result = session.execute(update_stmt)
-            print(f"{result = }")
-            session.commit()
-        except Exception as e:
-            print("INSERTION ERROR: ", e)
-            session.rollback()
-        finally:
-            session.close()
-
-
+        for record in records:
+            if record["id"] is not None:
+                records_to_update.append(record)
+            else:
+                record.pop("id")
+                records_to_create.append(record)
+        Component.objects.bulk_create(
+            [Component(**values) for values in records_to_create], batch_size=100
+        )
+        Component.objects.bulk_update(
+            [
+                Component(id=values.get("id"), price=values.get("price"), url=values.get("url"), image=values.get("image"), recently_scraped=True)
+                for values in records_to_update
+            ],
+            ["price", "url", "image", "recently_scraped"],
+            batch_size=100
+        )
+        
 class LocalJsonPipeline:
     def process_item(self, item, spider):
         filename = (
