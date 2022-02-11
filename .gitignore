@@ -5,3 +5,4 @@ __pycache__/
 venv/
 scrapy_output.txt
 db.sqlite3
+static/
