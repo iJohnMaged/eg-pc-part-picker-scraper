@@ -70,7 +70,15 @@ class PcpartsDownloaderMiddleware:
 
     def __init__(self):
         self.scraper = cloudscraper.create_scraper()
+        
+    @staticmethod
+    def is_cloudflare_challenge(response):
+        """Test if the given response contains the cloudflare's anti-bot protection"""
 
+        return (
+            response.status == 503
+            and response.headers.get('Server', '').startswith(b'cloudflare')
+        )
     def process_request(self, request, spider):
         # Called for each request that goes through the downloader
         # middleware.
@@ -81,12 +89,7 @@ class PcpartsDownloaderMiddleware:
         # - or return a Request object
         # - or raise IgnoreRequest: process_exception() methods of
         #   installed downloader middleware will be called
-        scraper_response = self.scraper.get(request.url)
-        response = HtmlResponse(
-            url=scraper_response.url, body=scraper_response.content, encoding="utf-8"
-        )
-        return response
-
+        return None
     def process_response(self, request, response, spider):
         # Called with the response returned from the downloader.
 
@@ -94,7 +97,16 @@ class PcpartsDownloaderMiddleware:
         # - return a Response object
         # - return a Request object
         # - or raise IgnoreRequest
-        return response
+        if not self.is_cloudflare_challenge(response):
+            return response
+        cloudflare_tokens, __ = self.scraper.get_tokens(
+            request.url,
+            user_agent=spider.settings.get('USER_AGENT')
+        )
+        request.cookies.update(cloudflare_tokens)
+        request.priority = 99999
+        return request
+
 
     def process_exception(self, request, exception, spider):
         # Called when a download handler or a process_request()

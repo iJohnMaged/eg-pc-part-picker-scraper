@@ -70,6 +70,7 @@ CONCURRENT_REQUESTS = 8
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
     "pcparts.middlewares.PcpartsDownloaderMiddleware": 543,
+    'scrapy.downloadermiddlewares.robotstxt.RobotsTxtMiddleware': None,
 }
 
 # Enable or disable extensions
@@ -108,8 +109,8 @@ ITEM_PIPELINES = {
 # HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
 
 OUTPUT_DIR = "scraped_data"
-LOG_STDOUT = True
-LOG_FILE = "scrapy_output.txt"
+# LOG_STDOUT = True
+# LOG_FILE = "scrapy_output.txt"
 
 # LOG_LEVEL = "ERROR"
 
