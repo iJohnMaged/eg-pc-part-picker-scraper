@@ -82,7 +82,7 @@ DOWNLOADER_MIDDLEWARES = {
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
     "pcparts.pipelines.FormatPipeline": 0,
-    # "pcparts.pipelines.DatabasePipeline": 1,
+    "pcparts.pipelines.DatabasePipeline": 1,
     "pcparts.pipelines.LocalJsonPipeline": 2,
 }
 
@@ -108,8 +108,8 @@ ITEM_PIPELINES = {
 # HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
 
 OUTPUT_DIR = "scraped_data"
-# LOG_STDOUT = True
-# LOG_FILE = "scrapy_output.txt"
+LOG_STDOUT = True
+LOG_FILE = "scrapy_output.txt"
 
 # LOG_LEVEL = "ERROR"
 

@@ -85,7 +85,6 @@ class PcpartsDownloaderMiddleware:
         response = HtmlResponse(
             url=scraper_response.url, body=scraper_response.content, encoding="utf-8"
         )
-        print("hereeeeee")
         return response
 
     def process_response(self, request, response, spider):
