@@ -8,7 +8,7 @@ class Category(models.Model):
 
 class Store(models.Model):
     name = models.TextField()
-    url = models.URLField()
+    url = models.TextField()
 
     class Meta:
         unique_together = ("name", "url")
@@ -16,9 +16,9 @@ class Store(models.Model):
 
 class Component(models.Model):
     name = models.TextField()
-    image = models.URLField()
+    image = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    url = models.URLField()
+    url = models.TextField()
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     store = models.ForeignKey(Store, on_delete=models.CASCADE)
     recently_scraped = models.BooleanField(default=True)
