@@ -3,6 +3,7 @@ from http.cookies import SimpleCookie
 import scrapy
 from .JournalPaginationSpider import JournalPaginationSpider
 
+
 class SigmaComputerSpider(JournalPaginationSpider):
     name = "SigmaComputerSpider"
     store_name = "Sigma Computer"
@@ -28,7 +29,9 @@ class SigmaComputerSpider(JournalPaginationSpider):
 
     def start_requests(self):
         yield scrapy.Request(
-            self.set_in_stock_url, callback=self.start_requests_with_cookies
+            self.set_in_stock_url,
+            callback=self.start_requests_with_cookies,
+            headers=self.request_headers,
         )
 
     def start_requests_with_cookies(self, response):
@@ -48,6 +51,7 @@ class SigmaComputerSpider(JournalPaginationSpider):
                         url,
                         meta=metadata,
                         cookies=self.cookies,
+                        headers=self.request_headers,
                     )
             else:
                 yield scrapy.Request(
@@ -57,6 +61,7 @@ class SigmaComputerSpider(JournalPaginationSpider):
                     cookies=self.cookies,
                     meta=metadata,
                     callback=self.parse,
+                    headers=self.request_headers,
                 )
 
     def parse(self, response):

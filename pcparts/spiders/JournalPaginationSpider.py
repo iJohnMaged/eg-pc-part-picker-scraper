@@ -1,8 +1,9 @@
 from .BaseSpider import BaseSpider
 
+
 class JournalPaginationSpider(BaseSpider):
     cookies = {}
-    
+
     def has_next_page(self, response):
         pagination = response.css("ul.pagination")
         if pagination:
@@ -12,7 +13,6 @@ class JournalPaginationSpider(BaseSpider):
             if next_page:
                 return True
         return False
-    
 
     def get_next_page(self, response):
         if not self.has_next_page(response):
@@ -30,4 +30,5 @@ class JournalPaginationSpider(BaseSpider):
             ),
             meta=next_page_meta,
             cookies=self.cookies,
+            headers=self.request_headers,
         )
