@@ -12,18 +12,18 @@ os.environ["DJANGO_SETTINGS_MODULE"] = "PcBuilder.settings"
 
 django.setup()
 
-from ScrapedItems.models import Store, Category, Component
+from ScrapedItems.models import Store, Category
 
 
 def init_db(spider_classes):
     """
     Inserts missing stores and categories into the database.
-    """    
+    """
     for spider in spider_classes:
         for category in spider.start_urls:
             Category.objects.get_or_create(name=category)
         Store.objects.get_or_create(name=spider.store_name, url=spider.store_url)
-    
+
 
 def main():
     settings = project.get_project_settings()
