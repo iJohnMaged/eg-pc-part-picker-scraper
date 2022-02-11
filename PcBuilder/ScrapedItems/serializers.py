@@ -21,3 +21,11 @@ class ComponentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Component
         fields = "__all__"
+
+
+class BuildSerializer(serializers.ModelSerializer):
+    components = ComponentSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Build
+        fields = "__all__"

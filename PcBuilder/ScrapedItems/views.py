@@ -2,7 +2,7 @@ import json
 from django.http import HttpResponseNotAllowed, JsonResponse
 from rest_framework import viewsets
 from .models import Component, Category, Build
-from .serializers import ComponentSerializer
+from .serializers import ComponentSerializer, BuildSerializer
 from rest_framework.exceptions import NotAcceptable
 from django.views.decorators.csrf import csrf_exempt
 
@@ -21,6 +21,11 @@ class ComponentViewset(viewsets.ModelViewSet):
             raise NotAcceptable("category_name does not exist")
 
         return Component.objects.filter(recently_scraped=True, category=category)
+
+
+class BuildViewset(viewsets.ModelViewSet):
+    queryset = Build.objects.all()
+    serializer_class = BuildSerializer
 
 
 @csrf_exempt
