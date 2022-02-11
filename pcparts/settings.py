@@ -10,10 +10,12 @@
 import sys
 import os
 import django
+from pathlib import Path
 from dotenv import load_dotenv
 
 # Django
-sys.path.append("../PcBuilder")
+django_root = os.path.join(Path(__file__).parent.parent, "PcBuilder")
+sys.path.append(django_root)
 os.environ["DJANGO_SETTINGS_MODULE"] = "PcBuilder.settings"
 
 django.setup()
@@ -80,7 +82,7 @@ CONCURRENT_REQUESTS = 8
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
     "pcparts.pipelines.FormatPipeline": 0,
-    "pcparts.pipelines.DatabasePipeline": 1,
+    # "pcparts.pipelines.DatabasePipeline": 1,
     "pcparts.pipelines.LocalJsonPipeline": 2,
 }
 
@@ -107,7 +109,7 @@ ITEM_PIPELINES = {
 
 OUTPUT_DIR = "scraped_data"
 LOG_STDOUT = True
-LOG_FILE = 'scrapy_output.txt'
+LOG_FILE = "scrapy_output.txt"
 
 # LOG_LEVEL = "ERROR"
 
