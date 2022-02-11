@@ -3,11 +3,11 @@ from django.db import models
 
 # Create your models here.
 class Category(models.Model):
-    name = models.CharField(max_length=100, unique=True)
+    name = models.TextField(unique=True)
 
 
 class Store(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.TextField()
     url = models.URLField()
 
     class Meta:
@@ -15,7 +15,7 @@ class Store(models.Model):
 
 
 class Component(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.TextField()
     image = models.URLField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
     url = models.URLField()
@@ -32,7 +32,7 @@ class Component(models.Model):
 
 class Build(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=100, null=True)
+    name = models.TextField(null=True)
     components = models.ManyToManyField(Component)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

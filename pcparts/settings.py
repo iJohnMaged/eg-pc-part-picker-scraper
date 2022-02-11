@@ -106,8 +106,8 @@ ITEM_PIPELINES = {
 # HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
 
 OUTPUT_DIR = "scraped_data"
-# LOG_STDOUT = True
-# LOG_FILE = 'scrapy_output.txt'
+LOG_STDOUT = True
+LOG_FILE = 'scrapy_output.txt'
 
 # LOG_LEVEL = "ERROR"
 
