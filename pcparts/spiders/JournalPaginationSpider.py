@@ -30,5 +30,4 @@ class JournalPaginationSpider(BaseSpider):
             ),
             meta=next_page_meta,
             cookies=self.cookies,
-            headers=self.request_headers,
         )

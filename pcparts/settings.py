@@ -32,7 +32,7 @@ NEWSPIDER_MODULE = "pcparts.spiders"
 FEED_EXPORT_ENCODING = "utf-8"
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
-USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36'
+USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36"
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = True
@@ -68,9 +68,9 @@ CONCURRENT_REQUESTS = 8
 
 # Enable or disable downloader middlewares
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
-# DOWNLOADER_MIDDLEWARES = {
-#    'pcparts.middlewares.PcpartsDownloaderMiddleware': 543,
-# }
+DOWNLOADER_MIDDLEWARES = {
+    "pcparts.middlewares.PcpartsDownloaderMiddleware": 543,
+}
 
 # Enable or disable extensions
 # See https://docs.scrapy.org/en/latest/topics/extensions.html
@@ -108,8 +108,8 @@ ITEM_PIPELINES = {
 # HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
 
 OUTPUT_DIR = "scraped_data"
-LOG_STDOUT = True
-LOG_FILE = "scrapy_output.txt"
+# LOG_STDOUT = True
+# LOG_FILE = "scrapy_output.txt"
 
 # LOG_LEVEL = "ERROR"
 

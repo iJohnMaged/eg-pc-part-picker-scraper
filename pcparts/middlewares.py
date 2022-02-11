@@ -2,11 +2,11 @@
 #
 # See documentation in:
 # https://docs.scrapy.org/en/latest/topics/spider-middleware.html
-
+import cloudscraper
+from scrapy.http import HtmlResponse
 from scrapy import signals
 
 # useful for handling different item types with a single interface
-from itemadapter import is_item, ItemAdapter
 
 
 class PcpartsSpiderMiddleware:
@@ -53,7 +53,7 @@ class PcpartsSpiderMiddleware:
             yield r
 
     def spider_opened(self, spider):
-        spider.logger.info('Spider opened: %s' % spider.name)
+        spider.logger.info("Spider opened: %s" % spider.name)
 
 
 class PcpartsDownloaderMiddleware:
@@ -68,6 +68,9 @@ class PcpartsDownloaderMiddleware:
         crawler.signals.connect(s.spider_opened, signal=signals.spider_opened)
         return s
 
+    def __init__(self):
+        self.scraper = cloudscraper.create_scraper()
+
     def process_request(self, request, spider):
         # Called for each request that goes through the downloader
         # middleware.
@@ -78,7 +81,12 @@ class PcpartsDownloaderMiddleware:
         # - or return a Request object
         # - or raise IgnoreRequest: process_exception() methods of
         #   installed downloader middleware will be called
-        return None
+        scraper_response = self.scraper.get(request.url)
+        response = HtmlResponse(
+            url=scraper_response.url, body=scraper_response.content, encoding="utf-8"
+        )
+        print("hereeeeee")
+        return response
 
     def process_response(self, request, response, spider):
         # Called with the response returned from the downloader.
@@ -100,4 +108,4 @@ class PcpartsDownloaderMiddleware:
         pass
 
     def spider_opened(self, spider):
-        spider.logger.info('Spider opened: %s' % spider.name)
+        spider.logger.info("Spider opened: %s" % spider.name)

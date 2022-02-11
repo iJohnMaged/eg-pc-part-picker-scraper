@@ -40,7 +40,6 @@ class EgpricesSpider(BaseSpider):
             yield response.follow(
                 response.urljoin(next_page),
                 meta=metadata,
-                headers=self.request_headers,
             )
         return None
 
