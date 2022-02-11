@@ -8,7 +8,7 @@ from typing import Union
 from scrapy.exceptions import DropItem
 from urllib.parse import quote, unquote
 from pcparts import settings as pcparts_settings
-
+import time
 from ScrapedItems.models import Component, Store, Category
 
 
@@ -44,7 +44,9 @@ class DatabasePipeline:
 
     def open_spider(self, _):
         self.stores = {store.name: store.id for store in Store.objects.all()}
-        self.categories = {category.name: category.id for category in Category.objects.all()}
+        self.categories = {
+            category.name: category.id for category in Category.objects.all()
+        }
 
     def process_item(self, item, spider):
         item_clone = item.copy()
@@ -65,49 +67,36 @@ class DatabasePipeline:
     def close_spider(self, spider):
         if not self.parts:
             return
-        
+
         store_id = self.stores[spider.store_name]
-        
-        Component.objects.filter(store_id=store_id).update(recently_scraped=False)
 
-        records_to_update = []
-        records_to_create = []
+        parts_to_update = []
 
-        records = [
-            {
-                "id": Component.objects.filter(
-                    category_id=part["category_id"],
-                    store_id=part["store_id"],
-                    name=part["name"],
-                    url=part["url"],
-                ).first().id
-                if Component.objects.filter(
-                    category_id=part["category_id"],
-                    store_id=part["store_id"],
-                    name=part["name"],
-                ).first() is not None else None, **part
-            }
-            for part in self.parts
-        ]
+        start = time.time()
+        for component in Component.objects.filter(store_id=store_id).iterator():
+            found = False
+            for part in self.parts:
+                if component.name == part["name"]:
+                    component.price = part["price"]
+                    component.recently_scraped = True
+                    found = True
+                    break
+            if not found:
+                component.recently_scraped = False
+            parts_to_update.append(component)
 
-        for record in records:
-            if record["id"] is not None:
-                records_to_update.append(record)
-            else:
-                record.pop("id")
-                records_to_create.append(record)
-        Component.objects.bulk_create(
-            [Component(**values) for values in records_to_create], batch_size=100
-        )
         Component.objects.bulk_update(
-            [
-                Component(id=values.get("id"), price=values.get("price"), url=values.get("url"), image=values.get("image"), recently_scraped=True)
-                for values in records_to_update
-            ],
-            ["price", "url", "image", "recently_scraped"],
-            batch_size=100
+            parts_to_update, ["price", "recently_scraped"], batch_size=1000
         )
-        
+        Component.objects.bulk_create(
+            [Component(**part) for part in self.parts],
+            batch_size=1000,
+            ignore_conflicts=True,
+        )
+
+        print(f"Stored in {time.time() - start}")
+
+
 class LocalJsonPipeline:
     def process_item(self, item, spider):
         filename = (

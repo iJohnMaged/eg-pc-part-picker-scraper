@@ -68,10 +68,10 @@ CONCURRENT_REQUESTS = 8
 
 # Enable or disable downloader middlewares
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
-DOWNLOADER_MIDDLEWARES = {
-    "pcparts.middlewares.PcpartsDownloaderMiddleware": 543,
-    'scrapy.downloadermiddlewares.robotstxt.RobotsTxtMiddleware': None,
-}
+# DOWNLOADER_MIDDLEWARES = {
+#     "pcparts.middlewares.PcpartsDownloaderMiddleware": 543,
+#     'scrapy.downloadermiddlewares.robotstxt.RobotsTxtMiddleware': None,
+# }
 
 # Enable or disable extensions
 # See https://docs.scrapy.org/en/latest/topics/extensions.html
