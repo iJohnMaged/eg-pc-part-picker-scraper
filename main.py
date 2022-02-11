@@ -1,45 +1,28 @@
+import sys
+import os
+import django
+
 from scrapy.crawler import CrawlerProcess
 from scrapy.utils import project
 from scrapy import spiderloader
-from pcparts.models import (
-    db_connect,
-    get_all_stores,
-    get_all_categories,
-    create_all_metadata,
-    sessionmaker,
-    Category,
-    Store,
-)
+
+# Django
+sys.path.append("./PcBuilder")
+os.environ["DJANGO_SETTINGS_MODULE"] = "PcBuilder.settings"
+
+django.setup()
+
+from ScrapedItems.models import Store, Category, Component
 
 
 def init_db(spider_classes):
     """
     Inserts missing stores and categories into the database.
-    """
-    engine = db_connect()
-    create_all_metadata(engine)
-    Session = sessionmaker(bind=engine)
-    session = Session()
-    stores = get_all_stores(session)
-    categories = get_all_categories(session)
-    stores_to_insert = []
-    categories_to_insert = []
-
-    for spider_class in spider_classes:
-        for category in spider_class.start_urls:
-            if category not in categories:
-                categories_to_insert.append({"name": category})
-        if spider_class.store_name not in stores:
-            stores_to_insert.append(
-                {"name": spider_class.store_name, "url": spider_class.store_url}
-            )
-
-    if stores_to_insert:
-        session.bulk_insert_mappings(Store, stores_to_insert)
-    if categories_to_insert:
-        session.bulk_insert_mappings(Category, categories_to_insert)
-    session.commit()
-    session.close()
+    """    
+    for spider in spider_classes:
+        for category in spider.start_urls:
+            Category.objects.get_or_create(name=category)
+        Store.objects.get_or_create(name=spider.store_name, url=spider.store_url)
     
 
 def main():
@@ -68,4 +51,5 @@ def main():
 
 
 if __name__ == "__main__":
+    print("Starting...")
     main()

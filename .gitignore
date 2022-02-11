@@ -4,3 +4,4 @@ __pycache__/
 .env
 venv/
 scrapy_output.txt
+db.sqlite3
