@@ -1,32 +1,20 @@
 import scrapy
+from furl import furl
 from pcparts.io_helper import create_folder
-from scrapy_playwright.page import PageCoroutine
 from pcparts import settings as pcparts_settings
-import re
 
-
-class PlaywrightSpider(scrapy.Spider):
+class BaseSpider(scrapy.Spider):
     required_attrs = ["start_urls"]
     initial_metadata = dict(
-        playwright=True,
-        playwright_include_page=True,
-        playwright_page_coroutines=[
-            PageCoroutine(
-                "route",
-                re.compile(".+google.+|.+facebook.+"),
-                lambda route: route.abort(),
-            ),
-            PageCoroutine("wait_for_load_state", "networkidle", timeout=60 * 1000),
-        ],
         page_number=1,
     )
     page_keyword = "page"
 
     def generate_url_with_query_params(self, url: str, page: int) -> str:
-        url_with_query_params = f"{url}?{self.page_keyword}={page}"
+        base = furl(url).add({self.page_keyword: page})
+        url_with_query_params = base.url
         try:
-            for key, value in self.query_params.items():
-                url_with_query_params += f"&{key}={value}"
+            url_with_query_params = furl(url).add(self.query_params).url
         except AttributeError:
             pass
         return url_with_query_params
@@ -38,14 +26,14 @@ class PlaywrightSpider(scrapy.Spider):
             if isinstance(initial_url, list):
                 for url in initial_url:
                     yield scrapy.Request(
-                        self.generate_url_with_query_params(
+                        url=self.generate_url_with_query_params(
                             url, metadata["page_number"]
                         ),
                         meta=metadata,
                     )
             else:
                 yield scrapy.Request(
-                    self.generate_url_with_query_params(
+                    url=self.generate_url_with_query_params(
                         initial_url, metadata["page_number"]
                     ),
                     meta=metadata,

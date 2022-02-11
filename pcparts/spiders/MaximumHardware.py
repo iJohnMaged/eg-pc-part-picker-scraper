@@ -1,7 +1,7 @@
-from .PlaywrightSpider import PlaywrightSpider
+from .JournalPaginationSpider import JournalPaginationSpider
 
 
-class MaximumHardwareSpider(PlaywrightSpider):
+class MaximumHardwareSpider(JournalPaginationSpider):
     name = "MaximumHardwareSpider"
     store_name = "Maximum Hardware"
     store_url = "https://www.maximumhardware.store"
@@ -30,7 +30,7 @@ class MaximumHardwareSpider(PlaywrightSpider):
         mfp="stock_status[7]",
     )
 
-    async def parse(self, response):
+    def parse(self, response):
         for product in response.css("div.products-list div.product-layout"):
             image_container = product.css("div.product-image-container")
             url = image_container.css("a::attr(href)").get()
@@ -44,17 +44,4 @@ class MaximumHardwareSpider(PlaywrightSpider):
                 "price": product.css("div.price span::text").get(),
             }
 
-        pagination = response.css("ul.pagination").get()
-        if pagination:
-            next_page = pagination.xpath(
-                '//li[@class="active"]/following-sibling::li/a/@href'
-            ).get()
-            if next_page:
-                metadata = response.meta.copy()
-                metadata.update(page_number=metadata["page_number"] + 1)
-                yield response.follow(
-                    self.generate_url_with_query_params(
-                        next_page, metadata["page_number"]
-                    ),
-                    meta=metadata,
-                )
+        yield from self.get_next_page(response)

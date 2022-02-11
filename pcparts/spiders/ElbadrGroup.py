@@ -1,7 +1,7 @@
-from .PlaywrightSpider import PlaywrightSpider
+from .JournalPaginationSpider import JournalPaginationSpider
 
 
-class ElBadrGroupSpider(PlaywrightSpider):
+class ElBadrGroupSpider(JournalPaginationSpider):
     name = "ElBadrGroupSpider"
     store_name = "El Badr Group"
     store_url = "https://elbadrgroupeg.store"
@@ -18,9 +18,9 @@ class ElBadrGroupSpider(PlaywrightSpider):
         storage="https://elbadrgroupeg.store/hdd",
         accessories="https://elbadrgroupeg.store/accessories",
     )
-    query_params = dict(fq=1)
+    query_params = dict(fq=1, limit=100)
 
-    async def parse(self, response):
+    def parse(self, response):
         for product in response.css(
             "div.main-products.product-grid div.product-layout"
         ):
@@ -37,19 +37,5 @@ class ElBadrGroupSpider(PlaywrightSpider):
                 "price": product.css("div.price div span::text").get(),
                 "url": product.css("div.name a::attr(href)").get(),
             }
-        end_of_products = response.css("div.ias-noneleft").get()
 
-        if end_of_products is None:
-            current_page_number = response.meta.get("page_number")
-            current_category = response.meta.get("category")
-            next_page_meta = response.meta.copy()
-            next_page_meta.update(
-                page_number=current_page_number + 1,
-            )
-            yield response.follow(
-                self.generate_url_with_query_params(
-                    self.start_urls[current_category],
-                    current_page_number + 1,
-                ),
-                meta=next_page_meta,
-            )
+        yield from self.get_next_page(response)

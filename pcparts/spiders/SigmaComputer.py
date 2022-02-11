@@ -1,10 +1,9 @@
-from .PlaywrightSpider import PlaywrightSpider
-import scrapy
-from http.cookies import SimpleCookie
 import urllib.parse
+from http.cookies import SimpleCookie
+import scrapy
+from .JournalPaginationSpider import JournalPaginationSpider
 
-
-class SigmaComputerSpider(PlaywrightSpider):
+class SigmaComputerSpider(JournalPaginationSpider):
     name = "SigmaComputerSpider"
     store_name = "Sigma Computer"
     store_url = "https://www.sigma-computer.com"
@@ -26,10 +25,8 @@ class SigmaComputerSpider(PlaywrightSpider):
         ],
     )
     set_in_stock_url = "https://www.sigma-computer.com/setout_of_stock?set_con=close"
-    cookies = {}
 
     def start_requests(self):
-        # Get cookies by setting items to be in stock only
         yield scrapy.Request(
             self.set_in_stock_url, callback=self.start_requests_with_cookies
         )
@@ -62,7 +59,7 @@ class SigmaComputerSpider(PlaywrightSpider):
                     callback=self.parse,
                 )
 
-    async def parse(self, response):
+    def parse(self, response):
         for product in response.css("div.products-list div.product-layout"):
             image_container = product.css("div.product-image-container")
             image = urllib.parse.urljoin(
@@ -80,17 +77,4 @@ class SigmaComputerSpider(PlaywrightSpider):
                 "price": product.css("p.price span::text").get(),
             }
 
-        pagination = response.css("ul.pagination")
-
-        if pagination is not None:
-            next_page_url = pagination.xpath(
-                "//ul[@class='pagination']/li/a[@rel='next']/@href"
-            ).get()
-            if next_page_url is not None:
-                metadata = response.meta.copy()
-                metadata.update(page_number=metadata["page_number"] + 1)
-                yield response.follow(
-                    next_page_url,
-                    meta=metadata,
-                    cookies=self.cookies,
-                )
+        yield from self.get_next_page(response)
